@@ -4,11 +4,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"helpers"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/julio77it/go-helpers/helpers"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -99,8 +100,8 @@ func main() {
 	defer rows.Close()
 
 	// the core of the example starts here
-	// helpers/sql.SQLRowHeaders : get the fields info from the resultset
-	rowHeaders, err := helpers.NewSQLRowHeaders(rows)
+	// helpers/sql.SQLRows : get the fields info from the resultset
+	rowHeaders, err := helpers.NewSQLRows(rows)
 
 	if err != nil {
 		fmt.Println(err)
@@ -108,7 +109,7 @@ func main() {
 	}
 
 	for ri := 0; rows.Next(); ri++ {
-		// Every row need the call of SQLRowHeaders.Fetch method
+		// Every row need the call of SQLRows.Fetch method
 		// it reads the fields bytes
 		if err := rowHeaders.Fetch(); err != nil {
 			fmt.Println(err)

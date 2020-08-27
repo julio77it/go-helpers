@@ -5,14 +5,14 @@ import (
 	"errors"
 )
 
-// NewSQLRowHeaders : build a SQLRowHeaders struct from a database/sql.Rows
-func NewSQLRowHeaders(rows *sql.Rows) (*SQLRowHeaders, error) {
+// NewSQLRows : build a SQLRows struct from a database/sql.Rows
+func NewSQLRows(rows *sql.Rows) (*SQLRows, error) {
 	ct, err := rows.ColumnTypes()
 	if err != nil {
 		return nil, err
 	}
 
-	rh := &SQLRowHeaders{
+	rh := &SQLRows{
 		rows:        rows,
 		columnTypes: ct,
 		columnBytes: make([]interface{}, len(ct)),
@@ -20,20 +20,25 @@ func NewSQLRowHeaders(rows *sql.Rows) (*SQLRowHeaders, error) {
 	return rh, nil
 }
 
-// SQLRowHeaders : holds the info about sql.Row fields
-type SQLRowHeaders struct {
+// SQLRows : holds the info about sql.Row fields
+type SQLRows struct {
 	rows        *sql.Rows
 	columnTypes []*sql.ColumnType
 	columnBytes []interface{}
 }
 
+// Next : prepares the next result row for reading with the Fetch method
+func (rh SQLRows) Next() bool {
+	return rh.rows.Next()
+}
+
 // Length : number of fields of the result set
-func (rh SQLRowHeaders) Length() int {
+func (rh SQLRows) Length() int {
 	return len(rh.columnTypes)
 }
 
 // Fetch : read the bytes of the current row
-func (rh *SQLRowHeaders) Fetch() error {
+func (rh *SQLRows) Fetch() error {
 	// reserve memory space
 	for i := 0; i < len(rh.columnBytes); i++ {
 		rh.columnBytes[i] = new(sql.RawBytes)
@@ -44,7 +49,7 @@ func (rh *SQLRowHeaders) Fetch() error {
 }
 
 // GetFieldByIndex : find a field By index. Return name, value and error
-func (rh SQLRowHeaders) GetFieldByIndex(index int) (string, interface{}, error) {
+func (rh SQLRows) GetFieldByIndex(index int) (string, interface{}, error) {
 	// Check the input parameters
 	if index < 0 || index >= len(rh.columnTypes) {
 		// return zerov, zerov, error
@@ -58,7 +63,7 @@ func (rh SQLRowHeaders) GetFieldByIndex(index int) (string, interface{}, error) 
 }
 
 // GetFieldByName : find a field By name. Returns index, value and error
-func (rh SQLRowHeaders) GetFieldByName(name string) (int, interface{}, error) {
+func (rh SQLRows) GetFieldByName(name string) (int, interface{}, error) {
 	err := errors.New("field not found")
 
 	for i, v := range rh.columnTypes {
