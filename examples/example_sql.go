@@ -101,24 +101,24 @@ func main() {
 
 	// the core of the example starts here
 	// helpers/sql.SQLRows : get the fields info from the resultset
-	rowHeaders, err := helpers.NewSQLRows(rows)
+	sqlRows, err := helpers.NewSQLRows(rows)
 
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(0)
 	}
 
-	for ri := 0; rows.Next(); ri++ {
+	for ri := 0; sqlRows.Next(); ri++ {
 		// Every row need the call of SQLRows.Fetch method
 		// it reads the fields bytes
-		if err := rowHeaders.Fetch(); err != nil {
+		if err := sqlRows.Fetch(); err != nil {
 			fmt.Println(err)
 			os.Exit(0)
 		}
 		fmt.Printf("ROW[%2d]\n", ri)
 
-		for fi := 0; fi < rowHeaders.Length(); fi++ {
-			name, value, err := rowHeaders.GetFieldByIndex(fi)
+		for fi := 0; fi < sqlRows.Length(); fi++ {
+			name, value, err := sqlRows.GetFieldByIndex(fi)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(0)
@@ -127,7 +127,7 @@ func main() {
 		}
 
 	}
-	if err := rows.Err(); err != nil {
+	if err := sqlRows.Err(); err != nil {
 		fmt.Println(err)
 		os.Exit(0)
 	}

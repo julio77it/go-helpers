@@ -32,6 +32,11 @@ func (rh SQLRows) Next() bool {
 	return rh.rows.Next()
 }
 
+// Err returns the error of the inner database/sql.Rows
+func (rh SQLRows) Err() error {
+	return rh.rows.Err()
+}
+
 // Length : number of fields of the result set
 func (rh SQLRows) Length() int {
 	return len(rh.columnTypes)
@@ -46,6 +51,20 @@ func (rh *SQLRows) Fetch() error {
 	// read as variadic parameters
 	err := rh.rows.Scan(rh.columnBytes...)
 	return err
+}
+
+// Get : return the entire row
+func (rh SQLRows) Get() map[string]interface{} {
+	result := make(map[string]interface{})
+
+	// Puts fields in a map
+	for i, ct := range rh.columnTypes {
+		key := ct.Name()
+		// TODO convert in the right value
+		value := string(*rh.columnBytes[i].(*sql.RawBytes))
+		result[key] = value
+	}
+	return result
 }
 
 // GetFieldByIndex : find a field By index. Return name, value and error
