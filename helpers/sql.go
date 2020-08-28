@@ -53,8 +53,8 @@ func (rh *SQLRows) Fetch() error {
 	return err
 }
 
-// Get : return the entire row
-func (rh SQLRows) Get() map[string]interface{} {
+// GetFields : return the entire row
+func (rh SQLRows) GetFields() map[string]interface{} {
 	result := make(map[string]interface{})
 
 	// Puts fields in a map

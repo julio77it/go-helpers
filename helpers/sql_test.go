@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
-	"runtime"
 	"testing"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -15,12 +14,9 @@ const (
 	queryStmt string = "SELECT * FROM quotes"
 )
 
-var db *sql.DB
-
-func TestMain(m *testing.M) {
-	var err error
+func TestNewSQLRows(t *testing.T) {
 	// open database
-	db, err = sql.Open("sqlite3", "sql_test.db")
+	db, err := sql.Open("sqlite3", "sql_test.db")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(0)
@@ -32,17 +28,11 @@ func TestMain(m *testing.M) {
 		fmt.Println(err)
 		os.Exit(0)
 	}
-	// start test session
-	os.Exit(m.Run())
-}
-
-func TestNewSQLRows(t *testing.T) {
 
 	rows, err := db.Query(queryStmt)
 	if err != nil {
 		t.Errorf("db.Query failed : %v", err)
 	}
-	fmt.Println(runtime.Caller(1))
 
 	// OK
 	_, err = NewSQLRows(rows)
@@ -59,6 +49,19 @@ func TestNewSQLRows(t *testing.T) {
 }
 
 func TestErr(t *testing.T) {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	defer db.Close()
+
+	// check the connection
+	if err = db.Ping(); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
 	rows, err := db.Query(queryStmt)
 	if err != nil {
 		t.Errorf("db.Query failed : %v", err)
@@ -76,6 +79,19 @@ func TestErr(t *testing.T) {
 }
 
 func TestNext(t *testing.T) {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	defer db.Close()
+
+	// check the connection
+	if err = db.Ping(); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
 	rows, err := db.Query(queryStmt)
 	if err != nil {
 		t.Errorf("db.Query failed : %v", err)
@@ -92,6 +108,19 @@ func TestNext(t *testing.T) {
 }
 
 func TestLength(t *testing.T) {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	defer db.Close()
+
+	// check the connection
+	if err = db.Ping(); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
 	rows, err := db.Query(queryStmt)
 	if err != nil {
 		t.Errorf("db.Query failed : %v", err)
@@ -109,6 +138,19 @@ func TestLength(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	defer db.Close()
+
+	// check the connection
+	if err = db.Ping(); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
 	rows, err := db.Query(queryStmt)
 	if err != nil {
 		t.Errorf("db.Query failed : got %v", err)
@@ -128,7 +170,20 @@ func TestFetch(t *testing.T) {
 	}
 }
 
-func TestGet(t *testing.T) {
+func TestGetFields(t *testing.T) {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	defer db.Close()
+
+	// check the connection
+	if err = db.Ping(); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
 	rows, err := db.Query(queryStmt)
 	if err != nil {
 		t.Errorf("db.Query failed : got %v", err)
@@ -138,11 +193,11 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		t.Errorf("NewSQLRows failed : got %v", err)
 	}
-	rows.Next()
+	rh.Next()
 	if err := rh.Fetch(); err != nil {
 		t.Errorf("SQLRows.Fetch failed : got %v", err)
 	}
-	row := rh.Get()
+	row := rh.GetFields()
 
 	if row["author"] == "" {
 		t.Errorf("SQLRows.Get failed expected field: got empty %v", row)
@@ -150,6 +205,19 @@ func TestGet(t *testing.T) {
 }
 
 func TestGetFieldByIndex(t *testing.T) {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	defer db.Close()
+
+	// check the connection
+	if err = db.Ping(); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
 	rows, err := db.Query(queryStmt)
 	if err != nil {
 		t.Errorf("db.Query failed : got %v", err)
@@ -159,7 +227,7 @@ func TestGetFieldByIndex(t *testing.T) {
 	if err != nil {
 		t.Errorf("NewSQLRows failed : got %v", err)
 	}
-	rows.Next()
+	rh.Next()
 	if err := rh.Fetch(); err != nil {
 		t.Errorf("SQLRows.Fetch failed : got %v", err)
 	}
@@ -172,6 +240,19 @@ func TestGetFieldByIndex(t *testing.T) {
 }
 
 func TestGetFieldByName(t *testing.T) {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	defer db.Close()
+
+	// check the connection
+	if err = db.Ping(); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
 	rows, err := db.Query(queryStmt)
 	if err != nil {
 		t.Errorf("db.Query failed : got %v", err)
@@ -190,5 +271,131 @@ func TestGetFieldByName(t *testing.T) {
 	}
 	if _, _, err := rh.GetFieldByName("author"); err != nil {
 		t.Errorf("SQLRows.Fetch failed : got %v", err)
+	}
+}
+
+// BenchmarkRows : test database/sql.Rows
+func BenchmarkRows(b *testing.B) {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	defer db.Close()
+
+	// check the connection
+	if err = db.Ping(); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	var author, quote string
+	for n := 0; n < b.N; n++ {
+		rows, err := db.Query(queryStmt)
+		if err != nil {
+			b.Errorf("db.Query failed : got %v", err)
+		}
+		for rows.Next() {
+			rows.Scan(author, quote)
+		}
+		rows.Close()
+	}
+}
+
+// BenchmarkSQLRowsGet : test helpers.SQLRows.Get
+func BenchmarkSQLRowsGetFields(b *testing.B) {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	defer db.Close()
+
+	// check the connection
+	if err = db.Ping(); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	for n := 0; n < b.N; n++ {
+		rows, err := db.Query(queryStmt)
+		if err != nil {
+			b.Errorf("db.Query failed : got %v", err)
+		}
+		rh, err := NewSQLRows(rows)
+		if err != nil {
+			b.Errorf("NewSQLRows failed : got %v", err)
+		}
+		for rh.Next() {
+			rh.Fetch()
+			rh.GetFields()
+		}
+		rows.Close()
+	}
+}
+
+// BenchmarkSQLRowsGetByIndex : test helpers.SQLRows.GetFieldByIndex
+func BenchmarkSQLRowsGetByIndex(b *testing.B) {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	defer db.Close()
+
+	// check the connection
+	if err = db.Ping(); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	for n := 0; n < b.N; n++ {
+		rows, err := db.Query(queryStmt)
+		if err != nil {
+			b.Errorf("db.Query failed : got %v", err)
+		}
+		rh, err := NewSQLRows(rows)
+		if err != nil {
+			b.Errorf("NewSQLRows failed : got %v", err)
+		}
+		for rh.Next() {
+			rh.Fetch()
+			rh.GetFieldByIndex(0)
+			rh.GetFieldByIndex(1)
+		}
+		rows.Close()
+	}
+}
+
+// BenchmarkSQLRowsGetByName : test helpers.SQLRows.GetFieldByName
+func BenchmarkSQLRowsGetByName(b *testing.B) {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	defer db.Close()
+
+	// check the connection
+	if err = db.Ping(); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	for n := 0; n < b.N; n++ {
+		rows, err := db.Query(queryStmt)
+		if err != nil {
+			b.Errorf("db.Query failed : got %v", err)
+		}
+		rh, err := NewSQLRows(rows)
+		if err != nil {
+			b.Errorf("NewSQLRows failed : got %v", err)
+		}
+		for rh.Next() {
+			rh.Fetch()
+			rh.GetFieldByName("author")
+			rh.GetFieldByName("quoteText")
+		}
+		rows.Close()
 	}
 }
