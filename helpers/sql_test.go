@@ -11,7 +11,7 @@ import (
 
 const (
 	// SQL : query the table
-	queryStmt string = "SELECT * FROM quotes"
+	queryStmt string = "SELECT * FROM quotes LIMIT 50"
 )
 
 func TestNewSQLRows(t *testing.T) {
@@ -289,6 +289,8 @@ func BenchmarkRows(b *testing.B) {
 		fmt.Println(err)
 		os.Exit(0)
 	}
+	b.ResetTimer()
+
 	var author, quote string
 	for n := 0; n < b.N; n++ {
 		rows, err := db.Query(queryStmt)
@@ -317,6 +319,8 @@ func BenchmarkSQLRowsGetFields(b *testing.B) {
 		fmt.Println(err)
 		os.Exit(0)
 	}
+	b.ResetTimer()
+
 	for n := 0; n < b.N; n++ {
 		rows, err := db.Query(queryStmt)
 		if err != nil {
@@ -349,6 +353,8 @@ func BenchmarkSQLRowsGetByIndex(b *testing.B) {
 		fmt.Println(err)
 		os.Exit(0)
 	}
+	b.ResetTimer()
+
 	for n := 0; n < b.N; n++ {
 		rows, err := db.Query(queryStmt)
 		if err != nil {
@@ -382,6 +388,8 @@ func BenchmarkSQLRowsGetByName(b *testing.B) {
 		fmt.Println(err)
 		os.Exit(0)
 	}
+	b.ResetTimer()
+
 	for n := 0; n < b.N; n++ {
 		rows, err := db.Query(queryStmt)
 		if err != nil {
@@ -395,6 +403,42 @@ func BenchmarkSQLRowsGetByName(b *testing.B) {
 			rh.Fetch()
 			rh.GetFieldByName("author")
 			rh.GetFieldByName("quoteText")
+		}
+		rows.Close()
+	}
+}
+
+// BenchmarkSQLRowsGetAllByIndex : test helpers.SQLRows.GetFieldByIndex
+func BenchmarkSQLRowsGetAllByIndex(b *testing.B) {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	defer db.Close()
+
+	// check the connection
+	if err = db.Ping(); err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	b.ResetTimer()
+
+	for n := 0; n < b.N; n++ {
+		rows, err := db.Query(queryStmt)
+		if err != nil {
+			b.Errorf("db.Query failed : got %v", err)
+		}
+		rh, err := NewSQLRows(rows)
+		if err != nil {
+			b.Errorf("NewSQLRows failed : got %v", err)
+		}
+		for rh.Next() {
+			rh.Fetch()
+			for i := 0; i < rh.Length(); i++ {
+				rh.GetFieldByIndex(i)
+			}
 		}
 		rows.Close()
 	}
