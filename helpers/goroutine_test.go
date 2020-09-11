@@ -1,8 +1,10 @@
-package helpers
+package helpers_test
 
 import (
 	"sync"
 	"testing"
+
+	"github.com/julio77it/go-helpers/helpers"
 )
 
 func TestGetGID(t *testing.T) {
@@ -16,7 +18,7 @@ func TestGetGID(t *testing.T) {
 
 	for i := 0; i < numgo; i++ {
 		go func() {
-			ch <- GetGID()
+			ch <- helpers.GetGID()
 			wg.Done()
 		}()
 	}

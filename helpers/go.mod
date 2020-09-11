@@ -1,4 +1,4 @@
-module helpers
+module github.com/julio77it/go-helpers/helpers
 
 go 1.13
 

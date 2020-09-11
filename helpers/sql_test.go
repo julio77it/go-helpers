@@ -1,4 +1,4 @@
-package helpers
+package helpers_test
 
 import (
 	"database/sql"
@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/julio77it/go-helpers/helpers"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -35,14 +36,14 @@ func TestNewSQLRows(t *testing.T) {
 	}
 
 	// OK
-	_, err = NewSQLRows(rows)
+	_, err = helpers.NewSQLRows(rows)
 	if err != nil {
 		t.Errorf("NewSQLRows failed : %v", err)
 	}
 	rows.Close()
 
 	// KO
-	_, err = NewSQLRows(rows)
+	_, err = helpers.NewSQLRows(rows)
 	if err == nil {
 		t.Errorf("NewSQLRows error expected, got %v", err)
 	}
@@ -68,7 +69,7 @@ func TestErr(t *testing.T) {
 	}
 	defer rows.Close()
 
-	rh, err := NewSQLRows(rows)
+	rh, err := helpers.NewSQLRows(rows)
 	if err != nil {
 		t.Errorf("NewSQLRows failed : %v", err)
 	}
@@ -98,7 +99,7 @@ func TestNext(t *testing.T) {
 	}
 	defer rows.Close()
 	// OK
-	rh, err := NewSQLRows(rows)
+	rh, err := helpers.NewSQLRows(rows)
 	if err != nil {
 		t.Errorf("NewSQLRows failed : %v", err)
 	}
@@ -127,7 +128,7 @@ func TestLength(t *testing.T) {
 	}
 	defer rows.Close()
 	// OK
-	rh, err := NewSQLRows(rows)
+	rh, err := helpers.NewSQLRows(rows)
 	if err != nil {
 		t.Errorf("NewSQLRows failed : %v", err)
 	}
@@ -155,7 +156,7 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Errorf("db.Query failed : got %v", err)
 	}
-	rh, err := NewSQLRows(rows)
+	rh, err := helpers.NewSQLRows(rows)
 	if err != nil {
 		t.Errorf("NewSQLRows failed : got %v", err)
 	}
@@ -189,7 +190,7 @@ func TestGetFields(t *testing.T) {
 		t.Errorf("db.Query failed : got %v", err)
 	}
 	defer rows.Close()
-	rh, err := NewSQLRows(rows)
+	rh, err := helpers.NewSQLRows(rows)
 	if err != nil {
 		t.Errorf("NewSQLRows failed : got %v", err)
 	}
@@ -223,7 +224,7 @@ func TestGetFieldByIndex(t *testing.T) {
 		t.Errorf("db.Query failed : got %v", err)
 	}
 	defer rows.Close()
-	rh, err := NewSQLRows(rows)
+	rh, err := helpers.NewSQLRows(rows)
 	if err != nil {
 		t.Errorf("NewSQLRows failed : got %v", err)
 	}
@@ -258,7 +259,7 @@ func TestGetFieldByName(t *testing.T) {
 		t.Errorf("db.Query failed : got %v", err)
 	}
 	defer rows.Close()
-	rh, err := NewSQLRows(rows)
+	rh, err := helpers.NewSQLRows(rows)
 	if err != nil {
 		t.Errorf("NewSQLRows failed : got %v", err)
 	}
@@ -326,7 +327,7 @@ func BenchmarkSQLRowsGetFields(b *testing.B) {
 		if err != nil {
 			b.Errorf("db.Query failed : got %v", err)
 		}
-		rh, err := NewSQLRows(rows)
+		rh, err := helpers.NewSQLRows(rows)
 		if err != nil {
 			b.Errorf("NewSQLRows failed : got %v", err)
 		}
@@ -360,7 +361,7 @@ func BenchmarkSQLRowsGetByIndex(b *testing.B) {
 		if err != nil {
 			b.Errorf("db.Query failed : got %v", err)
 		}
-		rh, err := NewSQLRows(rows)
+		rh, err := helpers.NewSQLRows(rows)
 		if err != nil {
 			b.Errorf("NewSQLRows failed : got %v", err)
 		}
@@ -395,7 +396,7 @@ func BenchmarkSQLRowsGetByName(b *testing.B) {
 		if err != nil {
 			b.Errorf("db.Query failed : got %v", err)
 		}
-		rh, err := NewSQLRows(rows)
+		rh, err := helpers.NewSQLRows(rows)
 		if err != nil {
 			b.Errorf("NewSQLRows failed : got %v", err)
 		}
@@ -430,7 +431,7 @@ func BenchmarkSQLRowsGetAllByIndex(b *testing.B) {
 		if err != nil {
 			b.Errorf("db.Query failed : got %v", err)
 		}
-		rh, err := NewSQLRows(rows)
+		rh, err := helpers.NewSQLRows(rows)
 		if err != nil {
 			b.Errorf("NewSQLRows failed : got %v", err)
 		}
@@ -441,5 +442,65 @@ func BenchmarkSQLRowsGetAllByIndex(b *testing.B) {
 			}
 		}
 		rows.Close()
+	}
+}
+
+func ExampleGetFieldByName() {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT * FROM quotes LIMIT 1")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer rows.Close()
+	rh, err := helpers.NewSQLRows(rows)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	if rh.Next() {
+		rh.Fetch()
+		idx, _, _ := rh.GetFieldByName("author")
+
+		fmt.Println(idx)
+		// Output:
+		// 1
+	}
+}
+
+func ExampleGetFields() {
+	// open database
+	db, err := sql.Open("sqlite3", "sql_test.db")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT * FROM quotes LIMIT 1")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer rows.Close()
+	rh, err := helpers.NewSQLRows(rows)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	if rh.Next() {
+		rh.Fetch()
+		row := rh.GetFields()
+
+		fmt.Println(len(row))
+		// Output:
+		// 3
 	}
 }
