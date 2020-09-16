@@ -11,30 +11,16 @@ func NewSQLRows(rows *sql.Rows) (*SQLRows, error) {
 	if err != nil {
 		return nil, err
 	}
+	rh := &SQLRows{rows, ct, make([]interface{}, len(ct))}
 
-	rh := &SQLRows{
-		rows:        rows,
-		columnTypes: ct,
-		columnBytes: make([]interface{}, len(ct)),
-	}
 	return rh, nil
 }
 
 // SQLRows : holds the info about sql.Row fields
 type SQLRows struct {
-	rows        *sql.Rows
+	*sql.Rows
 	columnTypes []*sql.ColumnType
 	columnBytes []interface{}
-}
-
-// Next : prepares the next result row for reading with the Fetch method
-func (rh SQLRows) Next() bool {
-	return rh.rows.Next()
-}
-
-// Err returns the error of the inner database/sql.Rows
-func (rh SQLRows) Err() error {
-	return rh.rows.Err()
 }
 
 // Length : number of fields of the result set
@@ -49,7 +35,7 @@ func (rh *SQLRows) Fetch() error {
 		rh.columnBytes[i] = new(sql.RawBytes)
 	}
 	// read as variadic parameters
-	err := rh.rows.Scan(rh.columnBytes...)
+	err := rh.Scan(rh.columnBytes...)
 	return err
 }
 

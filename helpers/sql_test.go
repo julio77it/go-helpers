@@ -49,65 +49,6 @@ func TestNewSQLRows(t *testing.T) {
 	}
 }
 
-func TestErr(t *testing.T) {
-	// open database
-	db, err := sql.Open("sqlite3", "sql_test.db")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(0)
-	}
-	defer db.Close()
-
-	// check the connection
-	if err = db.Ping(); err != nil {
-		fmt.Println(err)
-		os.Exit(0)
-	}
-	rows, err := db.Query(queryStmt)
-	if err != nil {
-		t.Errorf("db.Query failed : %v", err)
-	}
-	defer rows.Close()
-
-	rh, err := helpers.NewSQLRows(rows)
-	if err != nil {
-		t.Errorf("NewSQLRows failed : %v", err)
-	}
-	// OK
-	if err = rh.Err(); err != nil {
-		t.Errorf("SQLRows.Err expected nil, got %v", err)
-	}
-}
-
-func TestNext(t *testing.T) {
-	// open database
-	db, err := sql.Open("sqlite3", "sql_test.db")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(0)
-	}
-	defer db.Close()
-
-	// check the connection
-	if err = db.Ping(); err != nil {
-		fmt.Println(err)
-		os.Exit(0)
-	}
-	rows, err := db.Query(queryStmt)
-	if err != nil {
-		t.Errorf("db.Query failed : %v", err)
-	}
-	defer rows.Close()
-	// OK
-	rh, err := helpers.NewSQLRows(rows)
-	if err != nil {
-		t.Errorf("NewSQLRows failed : %v", err)
-	}
-	if rh.Next() == false {
-		t.Errorf("SQLRows.Length expected true, got false")
-	}
-}
-
 func TestLength(t *testing.T) {
 	// open database
 	db, err := sql.Open("sqlite3", "sql_test.db")
