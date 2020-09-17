@@ -1,6 +1,7 @@
 package helpers_test
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 
@@ -33,4 +34,9 @@ func TestGetGID(t *testing.T) {
 	if len(collected) != numgo {
 		t.Errorf("GetGID distinct goroutines. expected %d, got %d", numgo, len(collected))
 	}
+}
+
+func ExampleGetGID() {
+	fmt.Println(helpers.GetGID())
+	// Output: 1
 }

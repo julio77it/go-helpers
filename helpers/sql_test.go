@@ -386,7 +386,7 @@ func BenchmarkSQLRowsGetAllByIndex(b *testing.B) {
 	}
 }
 
-func ExampleGetFieldByName() {
+func ExampleSQLRows() {
 	// open database
 	db, err := sql.Open("sqlite3", "sql_test.db")
 	if err != nil {
@@ -394,54 +394,28 @@ func ExampleGetFieldByName() {
 		return
 	}
 	defer db.Close()
-
+	// query
 	rows, err := db.Query("SELECT * FROM quotes LIMIT 1")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	defer rows.Close()
+	// promote sql.Rows in helpers.SQLRows
 	rh, err := helpers.NewSQLRows(rows)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	// 1st row
 	if rh.Next() {
+		// read fields from bytes
 		rh.Fetch()
-		idx, _, _ := rh.GetFieldByName("author")
-
-		fmt.Println(idx)
-		// Output:
-		// 1
-	}
-}
-
-func ExampleGetFields() {
-	// open database
-	db, err := sql.Open("sqlite3", "sql_test.db")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer db.Close()
-
-	rows, err := db.Query("SELECT * FROM quotes LIMIT 1")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer rows.Close()
-	rh, err := helpers.NewSQLRows(rows)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	if rh.Next() {
-		rh.Fetch()
+		// get fields
 		row := rh.GetFields()
 
 		fmt.Println(len(row))
-		// Output:
-		// 3
 	}
+	// Output:
+	// 3
 }
